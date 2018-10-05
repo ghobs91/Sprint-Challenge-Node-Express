@@ -53,7 +53,11 @@ server.post("/api/projects", (req, res) => {
 
 // PUT to edit an existing project
 server.put("/api/projects/:id", (req, res) => {
-// in progress //
+  const {id} = req.params;
+  const updatedProject = req.body;
+  projectDb.update(id, updatedProject)
+    .then(projectExists => res.status(200).json(projectExists))
+    .catch(err => res.status(500).json({ error: `Server error --> ${err} `}));
 });
 
 // DELETE request to delete a specific project
