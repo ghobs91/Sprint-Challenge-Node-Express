@@ -60,7 +60,7 @@ server.put("/api/projects/:id", (req, res) => {
     .catch(err => res.status(500).json({ error: `Server error --> ${err} `}));
 });
 
-// DELETE request to delete a specific project
+// DELETE a specific project
 server.delete("/api/projects/:id", (req, res) => {
   const { id } = req.params;
   projectDb
@@ -79,21 +79,30 @@ server.delete("/api/projects/:id", (req, res) => {
 server.get("/api/actions", (req, res) => {
   actionDb
     .get()
-    .then(posts => res.status(200).send(posts))
+    .then(actions => res.status(200).send(actions))
     .catch(err => res.status(500).send(err));
 });
 
-// GET a specific post by id
+// GET a specific action by id
 server.get("/api/actions/:id", (req, res) => {
   actionDb
     .get(req.params.id)
-    .then(post => res.status(200).send(post))
+    .then(action => res.status(200).send(action))
     .catch(err => res.status(500).send(err));
 });
 
 // GET all actions associated with a specific project
-server.get("/projects/:id/actions", (req, res) => {
-// in progress //
+server.get("/api/projects/:id/actions", (req, res) => {
+  const {id} = req.params;
+  projectDb.getProjectActions(id)
+    .then(actions => {
+      if(actions.length < 1) {
+        res.status(200).send(`No actions found for Project #${id}.`)
+        return;
+      }
+      res.status(200).send(actions);
+    })
+    .catch(err => res.status(500).send(err));
 });
 
 // POST a new action 
@@ -116,7 +125,6 @@ server.post("/api/actions", (req, res) => {
     });
 
 });
-
 ///////
 
 // PUT to edit an existing action
@@ -138,7 +146,7 @@ server.put("/api/actions/:id", (req, res) => {
 server.delete("/api/actions/:id", (req, res) => {
   const { id } = req.params;
   actionDb.remove(id)
-    .then(post => res.status(200).send(`Action # ${id} successfully removed.`))
+    .then(action => res.status(200).send(`Action # ${id} successfully removed.`))
     .catch(err => res.status(500).send(err));
 });
 
